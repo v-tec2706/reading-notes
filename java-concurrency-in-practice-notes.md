@@ -27,3 +27,14 @@
 - *writing correct concurrent programs is primarly about managing access to shared, mutable state*
 
 ## 3. Sharing objects
+- we want not only to prevent one thread from modyfing the state of an object but also ensure that when a thread modifies the state of an object, other threads can *see* the changes that were made
+- in the absence of synchronization the compiler, processor and runtime can do some downrigh wierd things to the order in which operations appear to execute
+- it's not safe to use nonvolatile *long* and *double* values as 64 bit read can be trated as two indpendent 32 bit operations that can represent two different states (state can change between these tow operation - so the first 32 bits can be from old state and another 32 bits from the new state)
+- when threads *synchronize* on a common lock they all see the most up-to-date values of shared mutable vairiable
+- *volatile* variable notifies compiler and runtime that this variable is shared and operations on it should not be reordered with other memory operations. Read of a volatile varialbe always returns the most recent write by any thread. Use cases for *volatile* are completion, interruption or status flags.
+- keep objects confined to single thread
+- stack confinement is a special case of thread confinement in which an object can only be reached through local variables. It happens by default when we use primitively typed local vairables and for objects we need to store references in local variables and not let them to escape. 
+- ThreadLocal<T> allows you associate a per-thread value and can be conceptually treated as Map<Thread, T>. *get* always returns value recently passed to *set* from the currently executing thread. Commonly used to keep transaction state in different frameworks.
+- *final* fields cannot be modified, it is a good practice to make all fields *final* unless they need to be mutable 
+- to provide atomicity we can wrap data we want to operate on atomically with immutable data class e.g. to provide atomic write to two variables put them into signle immutable object and read/write consistent values from it
+- thread-safe collection ensures that every element written by thread A is visible in subsequent read from thread B
