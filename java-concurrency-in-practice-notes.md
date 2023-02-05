@@ -47,3 +47,17 @@
 - if a class is composed of multiple independent thread-safe state variables and has no operation that have any invalid state transitions, then it can delegate thread safety to the underlying state variables
 - when exteding a thread-safe class we should reuse the same synchronization mechanism to protect added methods. Also when adding helper method to let's say *list* in some *ListHelper* it's incorrect to use *synchronized(this)* as we want to lock on *list* instead of *ListHelper* (use *synchronized(list)* instead)
 - document a class's thread safety guarantees for its clients ; documet its synchronization policy for its maintainers
+
+## 5. Building blocks
+- synchronized collections are thread-safe but still can cause some isses, for example they don't prevent the situation when one thread modifies collection and another deletes some items in the same time, this can lead to error
+- concurrent collections are fully save to use, error mentioned above doesn't occur, but view of the collection can be temporarily unconsistent or stale
+- to enable concurrent processing we can use producer/consumer pattern, it splits computations in two parts - that decouples them and allow to run in parralel. Objects can be passed from producer to consumer via queue, it is thread-safe as these threads accesses shared object sequentially
+- synchronizers:
+    - latches: delay the progress of threads until it reaches terminal state. Once latch reaches terminal sstate it cannot change state again
+    - *FeatueTask*
+    - semaphores
+    - barriers
+- efficient, scalable result cache:
+    - naive implementation is to use *HashMap* with *synchronized* block covering computation (it's not effective as only one thread can perform operations at single time)
+    - better approach is to use *ConcurrentHashMap* (problem: if two threads request the same value at the same time they can duplicate computation)
+    - to improve that we can replace values with *Future* to mark that some value is already beeing calculated, inserting of *Future* should be done in synchronized block
