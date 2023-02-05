@@ -38,3 +38,12 @@
 - *final* fields cannot be modified, it is a good practice to make all fields *final* unless they need to be mutable 
 - to provide atomicity we can wrap data we want to operate on atomically with immutable data class e.g. to provide atomic write to two variables put them into signle immutable object and read/write consistent values from it
 - thread-safe collection ensures that every element written by thread A is visible in subsequent read from thread B
+ 
+## 4. Composing objects
+- object fields repersent the state it holds, that state should be encapsulated and thread-safe interface that transforms the object only between valid states should be exposed
+- encapsulating data within an object confines access to the data to the object's methods - making it easier to control
+- common pattern to convert non-thread-safe classes like e.g. collections into thread-safe is to add a wrapper that will synchronize access to inner state - it's called *monitor pattern* 
+- sometimes it is a good practice to use private lock object created inside the class to prevent external user from acquiring lock that synchronizes class state (disallow invalid usage)
+- if a class is composed of multiple independent thread-safe state variables and has no operation that have any invalid state transitions, then it can delegate thread safety to the underlying state variables
+- when exteding a thread-safe class we should reuse the same synchronization mechanism to protect added methods. Also when adding helper method to let's say *list* in some *ListHelper* it's incorrect to use *synchronized(this)* as we want to lock on *list* instead of *ListHelper* (use *synchronized(list)* instead)
+- document a class's thread safety guarantees for its clients ; documet its synchronization policy for its maintainers
