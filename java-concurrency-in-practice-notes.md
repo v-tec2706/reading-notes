@@ -61,3 +61,17 @@
     - naive implementation is to use *HashMap* with *synchronized* block covering computation (it's not effective as only one thread can perform operations at single time)
     - better approach is to use *ConcurrentHashMap* (problem: if two threads request the same value at the same time they can duplicate computation)
     - to improve that we can replace values with *Future* to mark that some value is already beeing calculated, inserting of *Future* should be done in synchronized block
+
+## 6. Task execution
+- concurrent applications are organized around the execution of tasks. Task should be independent and has clear boundaries. Good example of task is single request to the server
+- threads need to be created in *bounded* amount, creating too much requests may harm the program. Also creating each thread brings some overhead (time, stack memory consumption / thread creation in general is an expensive operation)
+- executor pattern is commonly used ot decouple task submission and its execution
+- *ExecutorService*:
+    - owns thread pool where incoming tasks can be executed 
+    - provide shutdown policy - immediate or gracefull(do not schedule any new tasks, allow already running tasks to be completed)
+- data rendering (example of a program where extracting parallel tasks is not that obvious): 
+    - use single thread, render all text at first (leave blanks for images) and then fetch and render images (naive)
+    - use two threads and two independent tasks, first to fetch end render text, and second to fetch end render images, when reader reaches image that is not yet rendered it wait until completion
+    - event better option is to download each image in parallel, and publish downloaded images to queue so that whenever download is completed it gets rendered
+    - conclusions: improvement in parallel processing is gained only when we have multiple, fine-grained and independent tasks that can be divided between multiple workers
+- sometimes there is no point in waiting for task completion longer as the result is no longer needed, that's why *timing* feature of parallel, *Feature* tasks is important, after timeout all resources used by thread should be freed
