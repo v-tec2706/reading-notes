@@ -75,3 +75,16 @@
     - event better option is to download each image in parallel, and publish downloaded images to queue so that whenever download is completed it gets rendered
     - conclusions: improvement in parallel processing is gained only when we have multiple, fine-grained and independent tasks that can be divided between multiple workers
 - sometimes there is no point in waiting for task completion longer as the result is no longer needed, that's why *timing* feature of parallel, *Feature* tasks is important, after timeout all resources used by thread should be freed
+
+## 7. Cancellation and shutdown
+ - naive apporach to task cancellation will be to use boolen flag and pool change of that flag, however it will not work for blocking tasks, as the task will be not able to detect the change
+ - that's why interruptioins were introduced, it's a way to notify one thread by another that it is exepcted to stop execution. JVM doesn't guarantee how fast blocking task will be interruped but it happens reasonably fast. For threads in blocked state *InterruptedException* is thrown, but in remaining cases interruption simply sets the flag, and it's running code responsiblity to react to that flag
+ - interruption is just an request that the thread interrupt itself at the next convenient opportunity 
+ - aproach that most of libraries take is throwing *InterruptedException* in response to an interrupt. Task get out of the way as quikly as possible and communicate the interruption back to the caller so that code higher up to the call stack can take further action. Exception can be thrown immediately or after the task completes some action.
+ - there should be no assumption made on interruption handling policy between task and thread that run that task (they should enclose that logic into their own scope)
+ - encapsulation prectices dictate that you should not manipulate an thread that you own it
+ - one way to stop a thread consuming queue is to send poison pill message to that queue
+ - when thread handling task queue is stopped we probably want to get tasks that were not completed, and resume them in another thread. Thats why the status of that tasks is returned, and that's also argument for having tasks indempotent (as the task that was started but not completed on the first thread can then run again on another thread). 
+ - well behaving task should never cause thread to fail, espectially when tasks are delegated to thread pools. On the other side thread pools should be resistant to such tasks and try to catch all unhandled runtime exception. Handler for such a tasks should be registered, by default it is simply `print(...)`
+ - JVM shoutdown is initiated when last nondaemon thread termiantes or for example `System.exit` appears. First all registered *shutdown hooks* are called. Shutdown hooks should be thread safe. Deamon threads are normal threads, with the only difference that JVM shout them down immediately, regardless of the state they are in (they are used for example for garbage collection). 
+ - using interruption for anything but cancellation should be avoided
