@@ -82,9 +82,16 @@
  - interruption is just an request that the thread interrupt itself at the next convenient opportunity 
  - aproach that most of libraries take is throwing *InterruptedException* in response to an interrupt. Task get out of the way as quikly as possible and communicate the interruption back to the caller so that code higher up to the call stack can take further action. Exception can be thrown immediately or after the task completes some action.
  - there should be no assumption made on interruption handling policy between task and thread that run that task (they should enclose that logic into their own scope)
- - encapsulation prectices dictate that you should not manipulate an thread that you own it
+ - encapsulation practices dictate that you should not manipulate an thread that you do not own
  - one way to stop a thread consuming queue is to send poison pill message to that queue
  - when thread handling task queue is stopped we probably want to get tasks that were not completed, and resume them in another thread. Thats why the status of that tasks is returned, and that's also argument for having tasks indempotent (as the task that was started but not completed on the first thread can then run again on another thread). 
  - well behaving task should never cause thread to fail, espectially when tasks are delegated to thread pools. On the other side thread pools should be resistant to such tasks and try to catch all unhandled runtime exception. Handler for such a tasks should be registered, by default it is simply `print(...)`
  - JVM shoutdown is initiated when last nondaemon thread termiantes or for example `System.exit` appears. First all registered *shutdown hooks* are called. Shutdown hooks should be thread safe. Deamon threads are normal threads, with the only difference that JVM shout them down immediately, regardless of the state they are in (they are used for example for garbage collection). 
  - using interruption for anything but cancellation should be avoided
+ 
+## 8. Applying thread pools
+- thread pools work best when tasks are homogeneeous and independent
+- thread pool with too small amount of resources can stuck when used for long-running task 
+- size of thread pool should be strictly related to number of processors, so that all resources are fully consumed. The more blocking task we perform the higher should be amount of threads we use as threads that perform blocking operation will be not schedulable. Even if we have very computation extensive operations we should add another extra thread in case if one of the runners fail
+- tasks that are waiting for assignment to thread pool are stored in a queue. Queue can be bounded or unbounded, bounded ones have saturation policies assigned - default one is to discard task and throw an exception
+- real thread pools implementations have dynamic size, they can decrease number of threads when they are idling or increase when the load is high
