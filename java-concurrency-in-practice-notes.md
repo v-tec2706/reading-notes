@@ -95,3 +95,10 @@
 - size of thread pool should be strictly related to number of processors, so that all resources are fully consumed. The more blocking task we perform the higher should be amount of threads we use as threads that perform blocking operation will be not schedulable. Even if we have very computation extensive operations we should add another extra thread in case if one of the runners fail
 - tasks that are waiting for assignment to thread pool are stored in a queue. Queue can be bounded or unbounded, bounded ones have saturation policies assigned - default one is to discard task and throw an exception
 - real thread pools implementations have dynamic size, they can decrease number of threads when they are idling or increase when the load is high
+
+## 9. GUI aplications
+- multithreading in the GUI is problematic as we have two directional flows, user actions are detected by OS and propagated to app, and tha app initiates some actions in response that are propagated to OS. It very often leads to deadlocks
+- long running tasks are typically delegated into background worker threads. They are decomposed into multiple subtasks that are scheduled after completion of some steps (initiation, waiting, presenting the results)
+- thread safe data model:
+    - versioned collections: copies are created when data is updated so that current iterator rely on the same data they saw at the beginning of the interation
+    - split data models: data split into two layers, presentation and shared, shared one is thread-safe and lies in the background. Updates are done safely to shared layer, shared layer creates update events that represent changes and they that are passed to presentation layer
