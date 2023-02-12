@@ -102,3 +102,14 @@
 - thread safe data model:
     - versioned collections: copies are created when data is updated so that current iterator rely on the same data they saw at the beginning of the interation
     - split data models: data split into two layers, presentation and shared, shared one is thread-safe and lies in the background. Updates are done safely to shared layer, shared layer creates update events that represent changes and they that are passed to presentation layer
+
+# 10. Avoid  liveness hazards
+- locks are quite common in database transactions and thats way they are automatically detected and recovered from. Transactions that cause locks are aborted
+- the program is free of deadlocks if all thread acqurie resources in the same, globally specified order
+- good idea is to sort objects that we want to acquire lock on by some globally unique value like object hash, this will alow to avoid any deadlocks
+- its risky to calling external method from synchronized method as it can try to acquire locks that we already hold, should be done carefully! *Open calls* is technique that states that we should always call external methods without keeping any lock on our side 
+- keeping synchronized block small also help to avoid locking situations
+- timed locking is a technique to timeout the lock acquisition if it was not possible in requested time period
+- dead-locks can be debugged with help of thread dumps
+- starvation happens when thread needs to wait long time to receive resource it needs. *Thread API* provides control over thread scheduling priorities, but it should be used carefully as it may lead to confusing situations, another negative aspect is that JVM thread prorities are mapped to OS thread priorities in different ways, so the program can behave differently on different platforms
+- *livelock* is a situation when threads are not truly blocked but they still cannot make progress because they perform operation that always fail (eg. try to apply recovery mechanism for unrecoverable error)
