@@ -103,7 +103,7 @@
     - versioned collections: copies are created when data is updated so that current iterator rely on the same data they saw at the beginning of the interation
     - split data models: data split into two layers, presentation and shared, shared one is thread-safe and lies in the background. Updates are done safely to shared layer, shared layer creates update events that represent changes and they that are passed to presentation layer
 
-# 10. Avoid  liveness hazards
+## 10. Avoid  liveness hazards
 - locks are quite common in database transactions and thats way they are automatically detected and recovered from. Transactions that cause locks are aborted
 - the program is free of deadlocks if all thread acqurie resources in the same, globally specified order
 - good idea is to sort objects that we want to acquire lock on by some globally unique value like object hash, this will alow to avoid any deadlocks
@@ -113,3 +113,20 @@
 - dead-locks can be debugged with help of thread dumps
 - starvation happens when thread needs to wait long time to receive resource it needs. *Thread API* provides control over thread scheduling priorities, but it should be used carefully as it may lead to confusing situations, another negative aspect is that JVM thread prorities are mapped to OS thread priorities in different ways, so the program can behave differently on different platforms
 - *livelock* is a situation when threads are not truly blocked but they still cannot make progress because they perform operation that always fail (eg. try to apply recovery mechanism for unrecoverable error)
+
+## 11. Performance and scalability
+- scalability describes the ability to improve throughput or capacity when additional computing resources are added, it's about designing application in such a way that adding resources would improve app performance 
+- *avoid premature optimitazion, first make it right, then make it fast if it is not alreay fast enough*
+- parallelization can bring performance improvement but also brings risks of breaking program correctness
+- Amdahl's law states how much can we improve performance of the app looking on percentage of part of the app that needs to be serialized. The grater is serialized part, the lower is resources utilization. Access to shared collections is commonly missed place where serialization occurs
+- performance benefits of parallelization must outweight the costs introduced by consucrrency, main costs are:
+    - context switching: scheduling different threads on the same core, causes reload of data the thread uses, erases cached data, takes about 5000-10000 CPU cycles, high activity of kernal can indicate that context swithces occur frequently in our app 
+    - memory synchronization: comes from *synchronised* blocks and *volatile* variables. Uncontended synchronization is quite well optimized by the JVM so we don't need to worry about that too much. When thread loose in contended synchronization it is blocked by the system until lock is available again, this requires two context switches
+- as lock contention is very expensive we should tend to avoid that by:
+    - keeping synchronized blocks as small as possible, hold the lock only in the places where it is really required 
+    - single lock should guard one independent state variable
+    - improvement example for concurrent collection: it can be split into *N* buckets with *N* locks that will allow for at most *N* concurrent writes (when all writers use another bucket). It's much better than single lock for single collection
+    - avoid *hot fields* (fields that are used by multiple operations)
+- objects pooling is a bad idea
+- performing logging operations in separate thread can bring imporvement. Without that, thread that perform operations needs to wait for I/O to print log. While beeing blocked by I/O it can be descheduled by the OS (blocked threads are descheduled from execution, context switch occurs). Also when multiple worker threads conquer for access to I/O it's getting "hot" resource and waiting time increases. Good approach is to delegate it to separate thread that will expose queue where workers can submit logs. *Put* operation will be synchronized but simple and fast operation so will no cause big congestion
+- summary: try to minimize size of sequential and blocking blocks of code to utilize underlying threads maximally
