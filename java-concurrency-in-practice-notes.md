@@ -130,3 +130,18 @@
 - objects pooling is a bad idea
 - performing logging operations in separate thread can bring imporvement. Without that, thread that perform operations needs to wait for I/O to print log. While beeing blocked by I/O it can be descheduled by the OS (blocked threads are descheduled from execution, context switch occurs). Also when multiple worker threads conquer for access to I/O it's getting "hot" resource and waiting time increases. Good approach is to delegate it to separate thread that will expose queue where workers can submit logs. *Put* operation will be synchronized but simple and fast operation so will no cause big congestion
 - summary: try to minimize size of sequential and blocking blocks of code to utilize underlying threads maximally
+
+# 12. Testing concurrent programs
+- testing of concurrent programs in much more difficult, it can be hard to catch a state where thread blocks. Introduction of any synchronization is not allowed as it can change the real behaviour of the program
+- testing for correctness:
+    - blocking: check if thread blocks and terminate it after specified time (e.g by interruption)
+    - switching: use more threads than the CPU that are available on the machine to increase interleaving level
+    - test concurrent program with high load and multiple worker threads, use barriers to wait for all threads until they are ready before test begins
+- testing for performance:
+    - it can help in specifying throughput and tunning of the code
+    - time of mulitple operations should be measured and then mean time of them calculated
+    - variance is also important measure that should be taken (it is better to have slower program but with stable variance)
+- pitfalls:
+    - check if GC does not break your test (try to avoid it happening or run long tests that encounter that it is happening)
+    - perform warm-up (so that *Hot spot* compilation happens outside of the test)
+    - prevent compiler to overoptimize tested code (e.g remove dead code)
