@@ -164,3 +164,16 @@
 - either fully expose waiting and notification protocols to subclasses or prevent inheritance
 - try to maximize encapsulation of all synchronization/notification mechanisms 
 - *Conditions* is just extension of conditions queues with richer interface, allows to specify multiple waiting groups
+
+# 15. Atomic variables and nonblocking synchronization
+- *Atomic* variables offer the same memory semantics as volatile variables, they can provide visibility guearantess but it's not possible to build atomic blocks of actions with them
+- when thread tries to acquire lock that is not free at that point it's getting suspendedi for some time, it generates high context-switching cost during contending locks acquisition
+- thread that waits for a lock cannot do anything else in the meantime, also even threds with higher priorities have to wait for locks that are currently hold by the threads with lower priorities, so their priority is effectively lowered 
+- blocking operation are quite operation-heavy for fine grined actions
+- harware support for concurrency:
+    - because of performance problems mentioned above, instead of obtaining the lock another opproach is used - optimistic update
+    - most of the processors have *compare-and-swap* operations that OS and JVM uses to implememnt locks and concurrent data structures
+    - CAS (*Compare and swap*): new value is only written to memory fields when the old expected value is correct, otherwise it means that value was overwritten in the meantime, in case of such collision thread that loose the opportuninty receives an error and can retry the operation again
+    - atomic CAS operations are performing better than locking equivalent for low congestion, when congestion grows locking mechanisms outperforms atomics - in practice, in production systems, congestion on a single lock is usually quite low
+- nonblocking algorithms
+    - concurrent collections uses algorithms that performs operations on that collections with use of CAS paradigm, it's enough to compose "steps" in such a way that it's possible to perform atomic action on them 
