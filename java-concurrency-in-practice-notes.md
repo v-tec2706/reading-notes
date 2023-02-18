@@ -145,3 +145,22 @@
     - check if GC does not break your test (try to avoid it happening or run long tests that encounter that it is happening)
     - perform warm-up (so that *Hot spot* compilation happens outside of the test)
     - prevent compiler to overoptimize tested code (e.g remove dead code)
+
+# 13. Explicit Locks
+ - ReentrantLock provides:
+    - advanced feature when compared with intrinsic locking mechanism
+    - gives a chance to interrupt a lock
+    - gives a chence to attempt locking in timed manner (lock in given period or return)
+    - fair vs unfair lock 
+        - fair: threads receive lock in order they acquired that
+        - unfair: any order, it gives better performance as while waiting for thread to wake up after lock was released another thread that is already wakenup can take that lock (throughput increases)
+    - don't use that untill you really need advanced feature that are offered by that lock, *synchronized* can be faster as it's buildin into JVM (better optimizations), Reentrant lock is less safa as is not automatically released
+    - read-write locks are available:
+        - it allows multiple readers but only one writer to use lock
+
+# 14. Building custom synchronizers:
+- condition queue: it gives a group of threads a way to wait for a specific condition to become true. Elements in condition queue are the threads waiting for the condition. (*waiy, notify, notifyAll*)
+- notification gives no guarantees that the condition that we are waiting for is actually met, so it should be checked once again
+- either fully expose waiting and notification protocols to subclasses or prevent inheritance
+- try to maximize encapsulation of all synchronization/notification mechanisms 
+- *Conditions* is just extension of conditions queues with richer interface, allows to specify multiple waiting groups
