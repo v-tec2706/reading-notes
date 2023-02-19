@@ -177,3 +177,13 @@
     - atomic CAS operations are performing better than locking equivalent for low congestion, when congestion grows locking mechanisms outperforms atomics - in practice, in production systems, congestion on a single lock is usually quite low
 - nonblocking algorithms
     - concurrent collections uses algorithms that performs operations on that collections with use of CAS paradigm, it's enough to compose "steps" in such a way that it's possible to perform atomic action on them 
+
+# 16. The Java memory model 
+- compiler can change the order of some operations to improve performance of the code, JVM requires just *within thread as-if-serial semantics*
+- in multiprocessor architecture, ensuring that every processor knows what every other processor is doing at all times is expensive and most of the time not needed
+- JMM is the abstraction layer that allows to isolate platform specific memory behaviour from JVM developer
+- lock is the source of program synchronization, having that we can analyse and reason about order in which actions in program happen
+- partially initialized object: not all constructor steps are finished before access from another thread happen 
+- *static* members are initilized by the JVM at class initialization time, after classloafing but before the class is used by any thread, JVM acquires lock to initialized object during initialization, and all each thread needs to acquire that lock as well before object usage to ensure that is already initialized, it applies only to members created during initial class constrcution, mutable members still require synchronization
+- *double-checked-locking* is deprecated - don't use it, it requires to check if reference is *null* twice, and if first check is not *null* then return reference (partially initialized object can be returned - that's why this is unsafe), else acquire lock, check once again, and initialize when still *null*
+- immutable, final fields that are setup in class constructor are always safe to share without synchronization and there is no risk of uninitialized object reads
