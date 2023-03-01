@@ -1,0 +1,22 @@
+# Functional event driven architecture
+
+## 1. Event-driven architecture
+ - is a siiftware architecture paradigm promoting production, detection, consumption and reaction to events
+ - events describe something that has happened in the past, event describe fact so it is immutable
+ - what problem it solves?
+     - having user authentication flow in monolith app, what should we do when last step of authentication that is trivial notification for metrics collector fails? shall we return HTTP 200 or 500?
+     - event-driven microservices threat events as source of true, they have clear responisblities and plans for error hanling, they allow to convert described synchronous process into asynchronous, decoupled parts
+- if our monolithic application does the job and aligns and aligns with the SLA, introducing an event-driven architecture will be more likely an over-kill, the time and resource needed to build such a system could be better assigned to business features improvement
+- EDA should be considered for apps with requirements of hight availability, uptime and fault tolerance - decoupling functionality increases chances of achieving that 
+- we can easily reach auditability and observability with EDA
+- microservice: 
+    - unit of funcitonality that can be deployed and scaled independently, has its own lifecycle
+    - enable fault-tolerance = our system might be capable of continuing to server requests in the presence of failures
+    - increase maintenance difficulty and roll-out coordination
+- not each functionality should be implemented in a new service, we can have multiple paths in a single service that exchange events - it is known as "listen-to-yourself" pattern
+- by decoupling functionalities we can extend and scale them independently 
+- CQRS:
+    - promotes the idea of separating an application between the writing and reading parts, that allows to apply required optimizations on either side
+    - required projections can be created between "read" and "write" side of an application
+    - good for asynchronous apps, not really for request-response model, or any transactional operations
+    
