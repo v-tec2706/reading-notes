@@ -47,3 +47,15 @@
            - distributed lock
              - used to synchronize access to shared resource 
              - efficient and lightweight version can be implemented with Redis (create key with you "lock" key and your "client_id" as a value, set expiration time => you can safely access resource as long as "lock" keeps your "client_id"" in value)
+
+## 3. Stateless vs. stateful
+ - a system is described as stateful if it is designed to remember preceding events or user interactions. It also needs to read an initial state from an external storage to start operating. 
+ - Pulsar:
+     - Kafka alternative
+     - has reliable deduplication mechanism
+     - allows for topic compaction (keeps only latest value for given key)
+     - support for transactions (consume, process and produce messages in one atomic operation)
+     - simpler to use and maintain than Kafka (quite important if you have no resources for Kafka maintenance)
+ - schema evolution:
+     - schema compatibility: new schema can be processed by old instances of services
+     - schema versioning: like with API endpoints versioning, topics with different schema versions can be maintained
