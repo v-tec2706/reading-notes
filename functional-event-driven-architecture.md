@@ -59,3 +59,9 @@
  - schema evolution:
      - schema compatibility: new schema can be processed by old instances of services
      - schema versioning: like with API endpoints versioning, topics with different schema versions can be maintained
+
+## 4. Functional programming in Scala 3
+## 5. Effectful streams
+ - having the stream of data that needs to be processed both in real time and batches we should split these processing modes as batch can block/slow-down the real-time = they should be splited into two independent subflows that are processed separately
+ - batching should be used when we for example need to write stream elements into database so that we can reduce amount of connection to database
+ 
