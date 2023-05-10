@@ -1,0 +1,42 @@
+# Kubernetes training
+
+1. Kubernetes arhitecture:
+ -  Kubernetes = an open-source system for automating delpoyment, scaling and managemnt of containerized applications
+ -  Kubernetes relies on the assumption that it will operate on a large number of small independent services (microservices) rather than on a monolith app
+ -  Chaos Monket = would users notice if you terminate any container randomly? If so, it may men that you app should be more decoupled and transient
+ -  cgroups and namespaces are the heart of containers, including Docker
+ -  Kuberbetes is made of one or more central managers and worker nodes
+     - API server serves responses from clients like kubectl or any custom implementation
+     - kube-scheduler sees the API requests for running a new container and finds suitable node to run that container 
+     - each node in a cluster has two containers:
+        - kubelet: manages resources and container engine (Docker engine that is installed on all the nodes) to ensure the container runs and restarts as expected. Takes Pod specifications as the input and tends to satisfy the requirements that are stated
+        - kube-proxy: container creates and manages local firewall and handles communiaction between containers 
+     - pod: smallest unit to work with, consists of one or more containers which share IP, data volumes and network namespace (typically we have one container for app and some containers supporting primary app). The *pause container* is placed in the pod to provide IP address, all containers in a pod will use its network namespace (it's not visible from k8s perspective). Containers can communicate via loopback interface, writing to files or via inter-process communication. 
+     Containers in a pod are started in parallel by default. 
+     - orchestration is managed via operators:
+        - *Deployment* operator: deployes and manages *ReplicaSet* operator
+        - *Replica Set* operator: deploys multiple pods, each with the same spec 
+        - *DeamonSet*: ensure that a single pod is deployed on every node (used for loggin, metrics, security)
+        - *StatefulSet* ensures that pods are started in specified order
+        - *label* are used by *selectors* to fetch some object without knowing their IDs
+     - isolation mechanisms:
+        - namespace: segregation of resources
+        - context: combination of user, cluster and namespace
+        - resource limits: a way to limit the amount of resources consumed by a pod
+        - Pod Security Admission
+        - Network Policies: the ability to have an inside-the-cluster firewall
+     - Control Plane Node Components:
+        - *kube-apiserver*: acts as a master process of a cluster, also as a frontend to the cluster's shared state, is the only one that connects to *etcd*
+        - *kube-scheduler*: selects which node will host a pod of containers (can have different algorithms for that), when there is no cluster space with requested specification the pod will remain pending 
+        - *etcd*: keps the state of the cluser, networking and other persistent information
+        - kube-controller-manager: core control loop deamon which interacts with the kube-apiserver to determine the state of the cluster 
+        - *Services* operator which connects resources together, also reconnect and replace what needed. Handles access policies for inbound requests
+        - *Operators* known as watch-loops, theu query current state, compare that against the spec and execute code based on how they differ
+    - *networking*:
+        - three main networing challenges:
+            - container-to-container communication (solved by the pod concept)
+            - pod-to-pod communication, the *Service* object is used to connect Pods within the network using ClusterIP adress, from outside of the cluster using NodePort address. 
+            - external-to-pod communication
+        - ClusterIP is used for traffic within the cluster
+        - NodePort: first creates a ClusterIP, then associates a port of the node to that new ClusterIP
+    - CNI network configuration file - used to standarize networking
