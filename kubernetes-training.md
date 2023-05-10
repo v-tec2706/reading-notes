@@ -1,6 +1,6 @@
-# Kubernetes training
+## Kubernetes training
 
-1. Kubernetes arhitecture:
+# 1. Kubernetes architecture:
  -  Kubernetes = an open-source system for automating delpoyment, scaling and managemnt of containerized applications
  -  Kubernetes relies on the assumption that it will operate on a large number of small independent services (microservices) rather than on a monolith app
  -  Chaos Monket = would users notice if you terminate any container randomly? If so, it may men that you app should be more decoupled and transient
