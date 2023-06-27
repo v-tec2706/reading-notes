@@ -50,3 +50,30 @@
     - readinessProbe: our application may have to initialize or be configured prior to being ready to accept traffic, the container will not accept traffic until the probe return a healthy state
     - livenessProbe: used to ensure that container stays in a healthy state, if probe fails the container will be terminated
     - startupProbe: useful for testing an application which takes a long time to start, liveness and readiness checks are disabled unitl the application passes the test
+
+# 3. Desing
+ - decoupled resources
+ - transience
+ - managing resource usage:
+    - by default, pods use as much CPU and memory as the workload requires
+    - CPU:
+        - units are milicore, .7 of CPU is 700 milicores
+        - if container uses more resources than allowed it is throttle 
+        - limits can be set to pod or container, if limit is set to pods all containers are throttled in the same time
+    - memory:
+        - handling of container which exceedes its memory limit is not defined: may be restarted or the enitre Pod can be evicted from the node
+    - storage: 
+        - pod that uses more storage than declared and available on the node can be evicted
+ - label selectors:
+    - labels: key/value pairs that are attached to objects such as Pods, used to specify identifying attributes of objects. Labels can be used to organize and select subsets of objects. Labels do not provide uniqueness, we expect many objects to carry the same lables
+    - label selector: allow user to identify set of objects
+ - multi-container pods:
+    - sidecar: used to add some functionality not present in the main container without bloating code, e.g logger
+    - adapter: used to modify input or output of main container, e.g to adapt logs produced by main container to monitoring tool (to achieve standarization between multiple apps)
+    - ambassador: allows to access to the ourside world without having to implement a service or another entry in an ingress controller
+    - initContainer: allows container to start only if "init" container exited successfully, eg. security scan of container before starting it
+- jobs:
+    - can be used when the microservice needs not to run all the time
+    - run a pod to completion
+    - Cronjobs
+
