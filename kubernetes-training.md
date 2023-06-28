@@ -77,3 +77,18 @@
     - run a pod to completion
     - Cronjobs
 
+# 4. Deployment configuration
+ - volumes:
+     - volume is directory, possibly pre-populated, made available to containers in a Pod
+     - 28 different volume types
+     - Persistent Volumes = storage lifetime distinct from a Pod 
+     - the same volume can be used by different containers = we can achieve pod to pod communication in such a way (no locking options available)
+     - *emptyDir* = kubelet will create the directory in the container, but not mount any storage, in result we obtain non persistent storage
+     - *hostPath* = mounts a resource from the host node filesystem
+     - secrets: 
+        - by default are not encrypted but encoded with base64, encryption can be added via *EncryptionConfiguration*
+        - can be exposed as a env variable or mounted volume
+     - configMaps:
+        - similar to Secrets but not encoded
+        - can store key-value pairs or plain configuration files in any format (file data stored in *data* section)
+    - both secrets and configMaps must exist prior to being used by a Pod (unless marked as optional)
