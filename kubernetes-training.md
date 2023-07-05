@@ -92,3 +92,23 @@
         - similar to Secrets but not encoded
         - can store key-value pairs or plain configuration files in any format (file data stored in *data* section)
     - both secrets and configMaps must exist prior to being used by a Pod (unless marked as optional)
+
+# 5. Security
+ - connections to Kubernetes API are protected with TLS
+ - access control layers:
+    - authentication
+        - done via: certificates, tokens or basic authentication
+        - support for system accounts
+    - authorization
+    - admission control: piece of code that intercepts requests to the Kubernetes API server prior to persistence of the object. May be validating, mutating or both. 
+- pods and container within pods can be given specific security constraints to limit what processes running in containers can do (Linux capabilities, filesystem group, etc.)
+- security limitations are called security context, it an be defined for the entire pod or per container. In such a rule you can specify for example that containers cannot run their process as the root user. 
+- PSP (Pod Security Policies): cluster-level rules that govern what a pod can do, what they can access or what user they run as. For example, we can define rule that any container in the cluster cannot run as a root. 
+- An alternative to PSP is to use OPA (Open Policy Agent) that can run as admission controller. 
+- Pod Security Standards: there are three main policies to limit what a pod is allowed to do:
+    - privileged
+    - baseline
+    - restricted
+- Network Security Policies: 
+    - by default, all pods can reach each other, all ingress and egress traffic is allowed
+    - NetworkPolicy: enable to control traffic to the pods, allows to use for example node selectors and select IP addresses or ports
