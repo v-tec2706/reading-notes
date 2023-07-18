@@ -112,3 +112,17 @@
 - Network Security Policies: 
     - by default, all pods can reach each other, all ingress and egress traffic is allowed
     - NetworkPolicy: enable to control traffic to the pods, allows to use for example node selectors and select IP addresses or ports
+
+# 6. Exposing applications: 
+ - Service type: 
+    - *Cluster IP*: default service type, provides access internally, *kubectl proxy* creates a local service to access a ClusterIP
+    - *NodePort*: is a simple connection from a high-port routed to a ClusterIP using iptables. The creation of NodePort generates a ClusterIP by default. Traffic is routed from the NodePort to the ClusterIP. Only high ports can be used. The NodePort is accessible via calls to *NodeIp:NodePort*
+    - *Load balancer*: created to pass requests to a cloud provider, even without a cloud provider, the address is made available to public traffic, and packages are spread among the Pods in the deployment automatically. Creating a *LoadBalancer* service generates a *NodePort*, which then creates a *ClusterIP*. It also sends an asynchronous call to an external load balancer, typically supplied by a cloud provider. The *External-IP* value will remain in a *Pending* state
+        until the load balaner return. Should it not return, the *NodePort* created acts as it would otherwise.
+    - *ExternalName*: allows to return of an alias to an external service (point to an external DNS server).  
+ - Services update pattern: 
+    - labels are used to determine which pods should receive traffic from a service, labels can be dynamically updated for an object, which may affect which Pods continue to connect to a service
+ - services can also be useed to point to a service in a different namespace, or even a resource outsie the cluster, such as a legacy application not yet in Kubernetes
+ - Ingress Controller: introduced to simplify management when number of services becomes high, manages ingress rules to route traffic to existing services. Ingress can be used for fan out to services, name-based hosting, TLS, or load balancing. 
+ - Service mesh: one can think about that as a proxy, side car container that is attached to original pod and manages things related to networking and communication like: security, discovery, circuit breakers, tracing, etc. This additional layer can be added independently to app layer (outside app container).  
+
