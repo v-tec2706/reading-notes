@@ -126,3 +126,25 @@
  - Ingress Controller: introduced to simplify management when number of services becomes high, manages ingress rules to route traffic to existing services. Ingress can be used for fan out to services, name-based hosting, TLS, or load balancing. 
  - Service mesh: one can think about that as a proxy, side car container that is attached to original pod and manages things related to networking and communication like: security, discovery, circuit breakers, tracing, etc. This additional layer can be added independently to app layer (outside app container).  
 
+# 7. Application trobleshooting
+ - basic throubleshoooting steps:
+    - pod/node logs
+    - shell 
+    - standard
+    - linux tools are usefull in kubernetes problems investigation (e.g. for networking issues) 
+    - check node healt, available resources
+    - deploy sidecar container for logging purposes 
+    - pods status (*kubectl get*)
+    - check security constraints (e.g RBAC)
+ - monitoring: collecting logs from the infrastructure
+    - Prometheus: allows to scrape resource usage metrics from Kubernetes objects across the entire cluster, allows to implement alerting
+    - Graphana: allows to visualize data retrieved via Prometheus
+ - logging tools: 
+    - collected locally, aggregated and then ingested into search engine or visualization tool (common toolset is ELK - Elastic, Logstash, Kibana)
+    - *kubelet* writes logs to local files via the Docker logging driver
+    - *Fluentd* can be used to aggregate logs cluster-wide (*Fluentd* agents run on each node via a DeamonSet, they aggregate the logs, and feed them to an Elasticsearch instance)
+ - tracing:
+    - allows for granular understanding of transaction across distributed architecture
+    - examples of tools: OpenTracing/Jaeger
+ - journal:
+    - system and agent files location depends on existance of systemd, the ones with systemd logs to `journalctl` and can be found by `journalctl -a`. Unless `/var/log/journal` directory exists that journal is volatile. Without `systemd` lod will be created under `/var/log/<agent>.log`
